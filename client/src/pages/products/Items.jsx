@@ -24,6 +24,7 @@ import AlertComponent from "../../components/Alert";
 import SellItemForm from "../dashboard/Sell";
 import AddItemForm from "../dashboard/AddItem";
 import QuickStat from "./QuickStat";
+import Footer from "../../components/Footer";
 const Items = () => {
   const storeId = localStorage.getItem("storeId");
   const dispatch = useDispatch();
@@ -367,6 +368,7 @@ const Items = () => {
           />
         </div>
       </div>
+      <Footer />
     </>
   );
 };

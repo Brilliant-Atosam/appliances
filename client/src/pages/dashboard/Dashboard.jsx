@@ -25,6 +25,8 @@ import { salesColumn } from "../../data";
 import Loading from "../../components/Loading";
 import SellItemForm from "./Sell";
 import SnackbarAlert from "../../components/Snackback";
+import Subscribe from "../../components/Subscribe";
+import Footer from "../../components/Footer";
 const Dashboard = () => {
   const dispatch = useDispatch();
   const storeId = localStorage.getItem("storeId");
@@ -49,10 +51,24 @@ const Dashboard = () => {
   const allItems = useSelector((state) => state.items.Items);
   const allSales = useSelector((state) => state.sales.Sales);
   const store = useSelector((state) => state.store.Store);
+
+  const [openSub, setOpenSub] = useState(false);
+  const [subTitle, setSubTile] = useState("SERVICE SUBSCRIPTION");
+  const [subContent, setSubContent] = useState(
+    "Welcome! You need to subscribe to this service in other to continue."
+  );
+  const [amount, setAmount] = useState(30);
+  const [btnText, setBtnText] = useState("Subscribe");
+
   useEffect(() => {
-    store.lastVerified === undefined && (window.location.href = "/sub");
-    new Date(store.nextVerification) < new Date() &&
-      (window.location.href = "/renew");
+    store.lastVerified === undefined && setOpenSub(true);
+    if (new Date(store.nextVerification) < new Date()) {
+      setOpenSub(true);
+      setAmount(20);
+      setSubTile("SUBSCRIPTION RENEWAL");
+      setSubContent("Your subscription to this service is due for renewal");
+      setBtnText("Renew");
+    }
   }, [store]);
   const [search, setSearch] = useState("");
   const [items, setItems] = useState(allItems);
@@ -230,9 +246,17 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
+
   return (
     <>
       <Navbar refresh={() => handleRefresh()} />
+      <Subscribe
+        open={openSub}
+        subTitle={subTitle}
+        subContent={subContent}
+        amount={amount}
+        btnText={btnText}
+      />
       <Loading open={loading} />
       <AlertComponent
         open={openAlert}
@@ -359,6 +383,7 @@ const Dashboard = () => {
           />
         </div>
       </div>
+      <Footer />
     </>
   );
 };

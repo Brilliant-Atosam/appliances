@@ -14,7 +14,6 @@ router.get("/", async (req, res) => {
 // ADD Store
 router.post("/", async (req, res) => {
   const { name, password, phone } = req.body;
-
   try {
     const newStore = new Store({
       name,
@@ -40,31 +39,33 @@ router.put("/:id", async (req, res) => {
         nextVerification: moment().add(30, "days").format("MM/DD/YYYY"),
       }
     );
-    res.status(200).json();
-    console.log("The work is done");
+    res.status(200).json("Subscription was successful");
   } catch (err) {
     res.status(500).json("Oooops! Try again");
     console.log(err.message);
   }
 });
-// RESTOCK DDEVICE
-router.put("/restock/:id", async (req, res) => {
-  try {
-    await Device.findOneAndUpdate(
-      { id: req.params.id },
-      { $inc: { stock: req.body.stock } }
-    );
-    res.json("Restocked successfully");
-  } catch (err) {
-    res.status(500).json("Oooops! Try again");
-    console.log(err.message);
-  }
-});
-// DELETE DDEVICE
+
+// DELETE STORE
 router.delete("/:id", async (req, res) => {
   try {
-    await Device.findOneAndDelete({ id: req.params.id });
+    await Store.findOneAndDelete({ id: req.params.id });
     res.json("Deletion successful!");
+  } catch (err) {
+    res.status(500).json("Oooops! Try again");
+  }
+});
+// RESET STORE PASSWORD
+router.put("/password/reset", async (req, res) => {
+  const { oldPassword, password } = req.body;
+  try {
+    const store = await Store.findOne({ id: req.query.id });
+    if (!(await bcrypt.compare(oldPassword, store.password))) {
+      res.status(401).json("Wrong password!");
+    } else {
+      await store.updateOne({ password: await bcrypt.hash(password, 10) });
+      res.json("Reset was successful!");
+    }
   } catch (err) {
     res.status(500).json("Oooops! Try again");
   }
